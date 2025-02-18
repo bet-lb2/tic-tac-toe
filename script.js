@@ -49,13 +49,11 @@ function GameController(
     const players = [
         {
         name: playerOneName,
-        token: 1,
-        wins: 0
+        token: 1
         },
         {
         name: playerTwoName,
-        token: 2,
-        wins: 0
+        token: 2
         }
     ];
 
@@ -123,6 +121,11 @@ function GameController(
             return;
         }
 
+        if (!gameOver && board.getBoard().every(row => row.every(cell => cell.getValue() !== 0))) {
+            console.log("It's tie");
+            return;
+        }
+
         switchPlayerTurn();
         printNewRound();
     };
@@ -136,3 +139,25 @@ function GameController(
 }
 
 const game = GameController();
+
+const getCurrentBoard = function() {
+    return Gameboard().getBoard().map(row => row.map(cell => cell.getValue()));
+}
+
+
+const displayGameboard = function() {
+    const gameboard = document.getElementById("gameboard");
+    const currentBoard = getCurrentBoard();
+    for (const row of currentBoard) {
+        for (let element of row) {
+            element = element === 0 ? "" : element === 1 ? "O" : "x";
+            console.log(element)
+            const div = document.createElement("div");
+            div.textContent = element;
+            gameboard.append(div);
+        }
+    }
+
+}
+
+displayGameboard();
