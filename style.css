@@ -19,6 +19,33 @@ body {
     height: 100vh;
 }
 
+dialog {
+    padding: 2rem;
+    margin: auto;
+}
+
+dialog form {
+    display: grid;
+    justify-content: center;
+}
+
+dialog div {
+    margin-bottom: 0.75rem;
+}
+
+dialog button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: #444;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+dialog button:hover {
+    opacity: 0.85;
+}
+
 #turn {
     font-size: 2rem;
 }
@@ -32,6 +59,7 @@ body {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     border: var(--gameboard-border-width) solid black;
+    visibility: hidden;
 }
 
 #gameboard div {

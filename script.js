@@ -139,8 +139,8 @@ function GameController(
     };
 }
 
-function ScreenController() {
-    const game = GameController();
+function ScreenController(palyer1Name, player2Name) {
+    const game = GameController(palyer1Name, player2Name);
     const playerTurnDiv = document.querySelector("#turn");
     const boardDiv = document.querySelector("#gameboard");
 
@@ -168,7 +168,6 @@ function ScreenController() {
     function clickHandlerBoard(e) {
         const selectedRow = e.target.dataset.row;
         const  selectedColumn = e.target.dataset.column;
-        // if (!selectedColumn) return;
 
         game.playRound(selectedRow, selectedColumn);
         updateScreen();
@@ -177,44 +176,21 @@ function ScreenController() {
     updateScreen();
 }
 
-ScreenController();
+function nameSelect() {
+    const dialog = document.querySelector("dialog");
+    dialog.showModal();
+    let playerOneName;
+    let playerTwoName;
 
+    function getPlayerName() {
+        playerOneName = document.getElementById("player-one-name").value || "Player One";
+        playerTwoName = document.getElementById("player-two-name").value || "Player Two";
+    }
+    document.querySelector("dialog form button").addEventListener("click", () => {
+        getPlayerName();
+        document.querySelector("#gameboard").style.visibility = "visible";
+        ScreenController(playerOneName, playerTwoName);
+    })
+}
 
-// const getCurrentBoard = function() {
-//     return Gameboard().getBoard().map(row => row.map(cell => cell.getValue()));
-// }
-
-// const displayGameboard = function() {
-//     const gameboard = document.getElementById("gameboard");
-//     // const currentBoard = getCurrentBoard();
-//     const currentBoard = 
-//     console.log(currentBoard)
-//     gameboard.innerHTML = "";
-//     for (let i = 0; i < currentBoard.length; i++) {
-//         for (let j = 0; j < currentBoard[0].length; j++) {
-//             cell =  currentBoard[i][j];
-//             cell = cell === 0 ? "" : cell === 1 ? "O" : "x";
-//             // console.log(cell)
-//             const div = document.createElement("div");
-//             const button = document.createElement("button");
-//             button.textContent = cell;
-//             button.setAttribute("data-row", i);
-//             button.setAttribute("data-column", j);
-//             div.append(button);
-//             gameboard.append(div);
-//         }
-//     }
-//     document.querySelectorAll("#gameboard div button").forEach(button => {
-//         button.addEventListener("click", (e) => {
-//             // e.stopImmediatePropagation();
-//             const row = e.target.dataset.row;
-//             const column = e.target.dataset.column;
-//             // console.log(row, column);
-//             game.playRound(row, column);
-//             displayGameboard();
-//         })
-//     })
-// }
-
-// const game = GameController();
-// displayGameboard();
+nameSelect();
