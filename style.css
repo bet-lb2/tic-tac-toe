@@ -1,6 +1,36 @@
+:root {
+    --gameboard-width: 500px;
+    --gameboard-height: 500px;
+    --gameboard-gap: 5px;
+    --gameboard-border-width: 5px;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+body {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#gameboard {
+    display: grid;
+    gap: var(--gameboard-gap);
+    background-color: gray;
+    width: var(--gameboard-width);
+    height: var(--gameboard-height);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    border: var(--gameboard-border-width) solid black;
+}
+
+#gameboard div {
+    background-color: white;
+    width: calc((var(--gameboard-width) - var(--gameboard-gap) * 2 - var(--gameboard-border-width) * 2) / 3);
+    height: calc((var(--gameboard-height) - var(--gameboard-gap) * 2 - var(--gameboard-border-width) * 2) / 3);
+}
