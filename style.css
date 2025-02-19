@@ -14,8 +14,13 @@
 body {
     display: grid;
     justify-content: center;
-    align-items: center;
+    align-content: center;
+    gap: 10px;
     height: 100vh;
+}
+
+#turn {
+    font-size: 2rem;
 }
 
 #gameboard {
@@ -33,4 +38,13 @@ body {
     background-color: white;
     width: calc((var(--gameboard-width) - var(--gameboard-gap) * 2 - var(--gameboard-border-width) * 2) / 3);
     height: calc((var(--gameboard-height) - var(--gameboard-gap) * 2 - var(--gameboard-border-width) * 2) / 3);
+}
+
+
+#gameboard div button {
+    cursor: pointer;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    font-size: 5rem;
 }

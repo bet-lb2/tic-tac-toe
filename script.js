@@ -134,30 +134,87 @@ function GameController(
 
     return {
         playRound,
-        getActivePlayer
+        getActivePlayer,
+        getBoard: board.getBoard
     };
 }
 
-const game = GameController();
+function ScreenController() {
+    const game = GameController();
+    const playerTurnDiv = document.querySelector("#turn");
+    const boardDiv = document.querySelector("#gameboard");
 
-const getCurrentBoard = function() {
-    return Gameboard().getBoard().map(row => row.map(cell => cell.getValue()));
-}
+    const updateScreen = () => {
+        boardDiv.innerHTML = "";
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
 
+        playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
 
-const displayGameboard = function() {
-    const gameboard = document.getElementById("gameboard");
-    const currentBoard = getCurrentBoard();
-    for (const row of currentBoard) {
-        for (let element of row) {
-            element = element === 0 ? "" : element === 1 ? "O" : "x";
-            console.log(element)
-            const div = document.createElement("div");
-            div.textContent = element;
-            gameboard.append(div);
-        }
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, columnIndex) => {
+                const cellDiv = document.createElement("div");
+                const cellButton = document.createElement("button");
+                cellButton.classList.add("cell");
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = columnIndex;
+                cellButton.textContent = cell.getValue() === 0  ? "" : cell.getValue() === 1 ? "o" : "x";
+                cellDiv.appendChild(cellButton);
+                boardDiv.appendChild(cellDiv);
+            })
+        })
     }
 
+    function clickHandlerBoard(e) {
+        const selectedRow = e.target.dataset.row;
+        const  selectedColumn = e.target.dataset.column;
+        // if (!selectedColumn) return;
+
+        game.playRound(selectedRow, selectedColumn);
+        updateScreen();
+    }
+    boardDiv.addEventListener("click", clickHandlerBoard);
+    updateScreen();
 }
 
-displayGameboard();
+ScreenController();
+
+
+// const getCurrentBoard = function() {
+//     return Gameboard().getBoard().map(row => row.map(cell => cell.getValue()));
+// }
+
+// const displayGameboard = function() {
+//     const gameboard = document.getElementById("gameboard");
+//     // const currentBoard = getCurrentBoard();
+//     const currentBoard = 
+//     console.log(currentBoard)
+//     gameboard.innerHTML = "";
+//     for (let i = 0; i < currentBoard.length; i++) {
+//         for (let j = 0; j < currentBoard[0].length; j++) {
+//             cell =  currentBoard[i][j];
+//             cell = cell === 0 ? "" : cell === 1 ? "O" : "x";
+//             // console.log(cell)
+//             const div = document.createElement("div");
+//             const button = document.createElement("button");
+//             button.textContent = cell;
+//             button.setAttribute("data-row", i);
+//             button.setAttribute("data-column", j);
+//             div.append(button);
+//             gameboard.append(div);
+//         }
+//     }
+//     document.querySelectorAll("#gameboard div button").forEach(button => {
+//         button.addEventListener("click", (e) => {
+//             // e.stopImmediatePropagation();
+//             const row = e.target.dataset.row;
+//             const column = e.target.dataset.column;
+//             // console.log(row, column);
+//             game.playRound(row, column);
+//             displayGameboard();
+//         })
+//     })
+// }
+
+// const game = GameController();
+// displayGameboard();
