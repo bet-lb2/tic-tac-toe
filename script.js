@@ -57,6 +57,8 @@ function GameController(
         }
     ];
 
+    const getPlayers = () => players;
+
     let activePlayer = players[0];
 
     const switchPlayerTurn = () => {
@@ -68,20 +70,19 @@ function GameController(
         board.printBoard();
         console.log(`${getActivePlayer().name}'s turn.`);
     };
-
+    
     let gameOver = false;
-
     const checkWinner = () => {
         const currentBoard = board.getBoard().map(row => row.map(cell => cell.getValue()));
 
-        let diagonal = []
+        let leftToRightDiagonal = []
         for (let i = 0; i < currentBoard.length; i++) {
             // check row
             if (currentBoard[i].every(cell => cell === 1) || currentBoard[i].every(cell => cell === 2)) {
                 gameOver = true;
             }
 
-            diagonal.push(currentBoard[i][i]);
+            leftToRightDiagonal.push(currentBoard[i][i]);
 
             //check column
             let column = [];
@@ -92,19 +93,23 @@ function GameController(
                 gameOver = true;
             }
         }
-        // check diagonal
-        if (diagonal.every(cell => cell === 1) || diagonal.every(cell => cell === 2)) {
+        // check leftToRightDiagonal
+        if (leftToRightDiagonal.every(cell => cell === 1) || leftToRightDiagonal.every(cell => cell === 2)) {
             gameOver = true;
         }
-        diagonal = [];
-        diagonal.push(currentBoard[0][2]);
-        diagonal.push(currentBoard[1][1]);
-        diagonal.push(currentBoard[2][0]);
-        if (diagonal.every(cell => cell === 1) || diagonal.every(cell => cell === 2)) {
+        // check rightToLeftDiagonal
+        let rightToLeftDiagonal = [];
+        rightToLeftDiagonal.push(currentBoard[0][2], currentBoard[1][1], currentBoard[2][0]);
+
+        if (rightToLeftDiagonal.every(cell => cell === 1) || rightToLeftDiagonal.every(cell => cell === 2)) {
             gameOver = true;
         }
+        return gameOver;
     }
 
+    const getGameOver = () => gameOver;
+    const initGameOver = () => gameOver = false;
+    let message;
     const playRound = (row, column) => {
         if (board.getBoard()[row][column].getValue() !== 0) {
             console.log("You can't select this cell. Please choose again.");
@@ -115,14 +120,20 @@ function GameController(
         );
         board.dropToken(row, column, getActivePlayer().token);
 
-        checkWinner();
-        if (gameOver) {
+        if (checkWinner()) {
             console.log(`${getActivePlayer().name} win!`);
+            // createPlayAgainModal(`${getActivePlayer().name} win!`);
+            // return `${getActivePlayer().name} win!`;
+            message = `${getActivePlayer().name} win!`;
+            // console.log(message)
             return;
         }
 
-        if (!gameOver && board.getBoard().every(row => row.every(cell => cell.getValue() !== 0))) {
+        if (!checkWinner() && board.getBoard().every(row => row.every(cell => cell.getValue() !== 0))) {
             console.log("It's tie");
+            // createPlayAgainModal("It's tie.");
+            // return "It's tie";
+            message = "It's tie";
             return;
         }
 
@@ -130,17 +141,25 @@ function GameController(
         printNewRound();
     };
 
+    const getMessage = () => message;
+    const initMessage = () => message = undefined;;
+
     printNewRound();
 
     return {
         playRound,
         getActivePlayer,
+        getGameOver,
+        getMessage,
+        getPlayers,
+        initGameOver,
+        initMessage,
         getBoard: board.getBoard
     };
 }
 
-function ScreenController(palyer1Name, player2Name) {
-    const game = GameController(palyer1Name, player2Name);
+function ScreenController(palyerOneName, playerTwoName) {
+    const game = GameController(palyerOneName, playerTwoName);
     const playerTurnDiv = document.querySelector("#turn");
     const boardDiv = document.querySelector("#gameboard");
 
@@ -169,22 +188,62 @@ function ScreenController(palyer1Name, player2Name) {
         const selectedRow = e.target.dataset.row;
         const  selectedColumn = e.target.dataset.column;
 
+        if (!selectedRow || !selectedColumn) return;
+
         game.playRound(selectedRow, selectedColumn);
+        if (game.getGameOver()) {
+            createPlayAgainModal(game.getMessage());
+        };
         updateScreen();
     }
     boardDiv.addEventListener("click", clickHandlerBoard);
     updateScreen();
+
+    function createPlayAgainModal(message) {
+        game.initGameOver();
+        game.initMessage();
+        const dialog = document.querySelector("dialog");
+        const playerOneName = game.getPlayers()[0].name;
+        const playerTwoName = game.getPlayers()[1].name;
+        dialog.innerHTML = `
+            <div class="message">
+                ${message}
+            </div>
+            <div class="buttons">
+                <button class="play-again">Play Again</button>
+                <button class="reset-game">Reset Game</button>
+            </div>`;
+        const resetGameButton = document.querySelector(".reset-game");
+        const playAgainButton = document.querySelector(".play-again");
+        resetGameButton.addEventListener("click", createNameSelectModal);
+        playAgainButton.addEventListener("click", () => {
+            ScreenController(playerOneName, playerTwoName);
+            dialog.close();
+        })
+        dialog.showModal();
+    }
 }
 
-function nameSelect() {
+function createNameSelectModal() {
     const dialog = document.querySelector("dialog");
+    dialog.innerHTML = `
+        <form action="#" method="dialog"><div>
+                <label for="player-one-name">Player One's name</label>
+                <input type="text" id="player-one-name" placeholder="Player One">
+            </div>
+            <div>
+                <label for="player-two-name">Player Two's name</label>
+                <input type="text" id="player-two-name" placeholder="Player two">
+            </div>
+            <button>Game Start</button>
+        </form>`
     dialog.showModal();
     let playerOneName;
     let playerTwoName;
 
     function getPlayerName() {
-        playerOneName = document.getElementById("player-one-name").value || "Player One";
-        playerTwoName = document.getElementById("player-two-name").value || "Player Two";
+        playerOneName = document.getElementById("player-one-name").value || undefined;
+        playerTwoName = document.getElementById("player-two-name").value || undefined;
     }
     document.querySelector("dialog form button").addEventListener("click", () => {
         getPlayerName();
@@ -193,4 +252,4 @@ function nameSelect() {
     })
 }
 
-nameSelect();
+createNameSelectModal();
